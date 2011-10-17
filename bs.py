@@ -36,18 +36,21 @@ def fetch_html(url):
         try: html = urllib2.urlopen(req)
         except urllib2.HTTPError, e:
             print e
-            print 'Will try again a sec from now'
             count += 1
             if count < maxwait:
+                print 'Will try again', count, 'secs from now'
                 time.sleep(count)
-            else: time.sleep(maxwait)
+            else:
+                count = 15
+                print 'Will try again', count, 'secs from now'
+                time.sleep(count)
             html = None
         else:
             return html    
 
 #print fetch_html(onco)
     
-def get_bottomURLs(url, pickle_saved):
+def get_bottomURLs(url):
     """The search results are scattered among several urls listed at the
     bottom of the html source. 
     (the numbers at the bottom of the web page -- inside a tag of the 
@@ -60,15 +63,20 @@ def get_bottomURLs(url, pickle_saved):
     filtro = SoupStrainer('div', attrs={'class': 'cx-step-full-index'})
     soup = BeautifulSoup(html.read(), filtro)
     data = soup('a')
-    with open(pickle_saved,'rb') as saved_data:
-        urls = pickle.load(saved_data)
+    with open('pickle_saved','rb') as saved_data:
+        try: urls = pickle.load(saved_data)
+        except EOFError:
+            urls = {}
     for i in data:
         #print len(urls)
         url = i['href']
         number = i.text
-        if number not in urls:
-            urls[number] = 
-    with open(pickle_saved, 'wb') as savedata:
+        try: number = int(number)
+        except ValueError:
+            continue
+        if number not in urls and url not in urls.values():
+            urls[number] = url
+    with open('pickle_saved', 'wb') as savedata:
         pickle.dump(urls, savedata)
     return urls
             
@@ -84,12 +92,10 @@ def get_allURLs(baseSearchURL):
         urlNumber = int(hits/10) #because 10 hits are displayed per page
     else:
         urlNumber= int(hits/10 + 1)
-    urls = get_bottomURLs(baseSearchURL, 'pickle_saved')
+    urls = get_bottomURLs(baseSearchURL)
     while len(urls) < urlNumber:
-        #keep appending the last url listed at the bottom links 
-        nextURL = get_bottomURLs(urls[len(urls)])
-        print 'nextURL', nextURL
-        urls.append(nextURL)
+        #keep adding the last url listed at the bottom links
+        urls = get_bottomURLs(urls[len(urls)])
         print 'counted urls', len(urls)
     return urls     
    
