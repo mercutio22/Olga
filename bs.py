@@ -72,7 +72,7 @@ def get_bottomURLs(url):
         url = i['href']
         number = i.text
         try: number = int(number)
-        except ValueError:
+        except ValueError, TypeError:
             continue
         if number not in urls and url not in urls.values():
             urls[number] = url
