@@ -1,0 +1,3 @@
+#encoding=utf8
+
+O programa com BeautifulSoup ainda é muito lento e não termina de pegar as urls contendo os resultados.

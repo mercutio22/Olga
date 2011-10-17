@@ -14,6 +14,8 @@
 from BeautifulSoup import BeautifulSoup, SoupStrainer
 import urllib2
 import re
+import time
+import pickle 
 
 onco = u'http://medial-saude.guiareunimedicos.med.br/index.pl?act=sear\
 ch&_id_=172&_ev_=Submit&_formSearchSubmit=%3Adefault%3A&type=0&country=\
@@ -23,30 +25,57 @@ cancer = u'http://www.guiareunimedicos.med.br/index.pl?act=search&_id_=\
 172&_ev_=Submit&_formSearchSubmit=%3Adefault%3A&type=0&country=0&q=canc\
 erologia#results'
 
+def fetch_html(url):
+    """gets html source code from url. Handles HTTP 503s"""
 
-def get_bottomURLs(url):
+    req = urllib2.Request(url)
+    count = 0
+    html = None
+    maxwait = 15
+    while not html:
+        try: html = urllib2.urlopen(req)
+        except urllib2.HTTPError, e:
+            print e
+            print 'Will try again a sec from now'
+            count += 1
+            if count < maxwait:
+                time.sleep(count)
+            else: time.sleep(maxwait)
+            html = None
+        else:
+            return html    
+
+#print fetch_html(onco)
+    
+def get_bottomURLs(url, pickle_saved):
     """The search results are scattered among several urls listed at the
     bottom of the html source. 
     (the numbers at the bottom of the web page -- inside a tag of the 
     sort <div class="cx-step-full-index">) 
-    This function fetches them and return as list."""
+    This function fetches them and return as list.
+    pickle_saved: a pickle dumped dictionary of the form resultpage
+    -link number: url"""
     
-    html = urllib2.urlopen(url)
+    html = fetch_html(url)     
     filtro = SoupStrainer('div', attrs={'class': 'cx-step-full-index'})
     soup = BeautifulSoup(html.read(), filtro)
     data = soup('a')
-    urls = []
+    with open(pickle_saved,'rb') as saved_data:
+        urls = pickle.load(saved_data)
     for i in data:
         #print len(urls)
         url = i['href']
-        if url not in urls:
-            urls.append(url)
+        number = i.text
+        if number not in urls:
+            urls[number] = 
+    with open(pickle_saved, 'wb') as savedata:
+        pickle.dump(urls, savedata)
     return urls
             
 def get_allURLs(baseSearchURL):
     """"Gets the URLs containing the remaining data from the search"""
     
-    html = urllib2.urlopen(baseSearchURL)
+    html = fetch_html(baseSearchURL)
     filtro = SoupStrainer('span', attrs={'class': 'cx-step-total-count'})
     data = BeautifulSoup(html.read(), filtro)
     hits = float(data.text)
@@ -55,14 +84,14 @@ def get_allURLs(baseSearchURL):
         urlNumber = int(hits/10) #because 10 hits are displayed per page
     else:
         urlNumber= int(hits/10 + 1)
-    urls = get_bottomURLs(baseSearchURL)
+    urls = get_bottomURLs(baseSearchURL, 'pickle_saved')
     while len(urls) < urlNumber:
-        #keep appending the last url at listed at the bottom links 
-        nextURL = get_bottomURLs(urls[-1])[-1]
+        #keep appending the last url listed at the bottom links 
+        nextURL = get_bottomURLs(urls[len(urls)])
         print 'nextURL', nextURL
         urls.append(nextURL)
         print 'counted urls', len(urls)
-    return urls    
+    return urls     
    
 def get_medics(url):
     """ pega os trechos de código html de uma url de resultados de busca 
@@ -71,7 +100,7 @@ def get_medics(url):
     Retorna uma lista com objetos BeautifulSoup contendo dados corres-
     pondentes a cada médico"""
     
-    html = urllib.urlopen(url)
+    html = fetch_html(url)
     soup = BeautifulSoup(html.read())
     #first BS object to append to:
     medicdata = soup.findAll('li', attrs={'class': re.compile('dsimple')}) 
