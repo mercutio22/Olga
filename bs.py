@@ -26,9 +26,9 @@ cancer = u'http://www.guiareunimedicos.med.br/index.pl?act=search&_id_=\
 erologia#results'
 
 def fetch_html(url):
-        """gets html source code from url. Handles HTTP 503s"""
+    """gets html source code from url. Handles HTTP 503s"""
 
-    count =15
+    count = 15
     time.sleep(count)   
     req = urllib2.Request(url)
     html = None
