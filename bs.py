@@ -28,6 +28,7 @@ erologia#results'
 def fetch_html(url):
     """gets html source code from url. Handles HTTP 503s"""
 
+    time.sleep(15)   
     req = urllib2.Request(url)
     count = 0
     html = None
