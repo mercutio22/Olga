@@ -26,18 +26,18 @@ cancer = u'http://www.guiareunimedicos.med.br/index.pl?act=search&_id_=\
 erologia#results'
 
 def fetch_html(url):
-    """gets html source code from url. Handles HTTP 503s"""
+        """gets html source code from url. Handles HTTP 503s"""
 
-    time.sleep(15)   
+    count =15
+    time.sleep(count)   
     req = urllib2.Request(url)
-    count = 0
     html = None
     maxwait = 15
     while not html:
         try: html = urllib2.urlopen(req)
         except urllib2.HTTPError, e:
             print e
-            count += 1
+            #count += 1
             if count < maxwait:
                 print 'Will try again', count, 'secs from now'
                 time.sleep(count)
