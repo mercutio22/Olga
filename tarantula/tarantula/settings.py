@@ -13,4 +13,6 @@ SPIDER_MODULES = ['tarantula.spiders']
 NEWSPIDER_MODULE = 'tarantula.spiders'
 DEFAULT_ITEM_CLASS = 'tarantula.items.TarantulaItem'
 USER_AGENT = '%s/%s' % (BOT_NAME, BOT_VERSION)
+CONCURRENT_REQUESTS = 1 #tentando evitar 503s
+
 

@@ -1,7 +1,7 @@
 #encoding=utf-8
 
 from scrapy.spider import BaseSpider
-from  tarantula.items import TarantulaItem
+from  tarantula.items import OlgaItem
 import scrapy.selector
 from scrapy.http import Request, HtmlResponse
 
@@ -22,7 +22,7 @@ h&_id_=172&_ev_=Submit&_formSearchSubmit=%3Adefault%3A&type=0&country=0\
 #2&_ev_=Submit&_formSearchSubmit=%3Adefault%3A&type=0&country=0&q=cancer\
 #ologia#results/' ]
 
-    Titems = [] #this will hold every TarantulaItem.
+    Titems = [] #this will hold every OlgaItem.
     Go = True
     counter = 1
     
@@ -44,11 +44,11 @@ h&_id_=172&_ev_=Submit&_formSearchSubmit=%3Adefault%3A&type=0&country=0\
 
     def record(self, links, names):
         """Gets two equal-lenght lists of Doctor names and URLs
-        Returns a list of TarantulaItems"""
+        Returns a list of OlgaItems"""
         
         items = []
         for i in range(len(names)):
-            aranha = TarantulaItem()
+            aranha = OlgaItem()
             aranha['name'] = names[i]
             aranha['link'] = links[i]
             items.append(aranha)

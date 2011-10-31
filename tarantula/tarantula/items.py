@@ -5,13 +5,12 @@
 
 from scrapy.item import Item, Field
 
-class TarantulaItem(Item):
-    # define the fields for your item here like:
-    # name = Field()
+class OlgaItem(Item):
     name = Field()
     link = Field()
 
-class TestItem(Item):
-    id = Field()
-    name = Field()
-    description = Field()
+class MafaldaItem(OlgaItem):
+    iD = Field()
+    address = Field()
+    phone = Field()
+    
