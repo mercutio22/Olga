@@ -7,10 +7,9 @@ from scrapy.item import Item, Field
 
 class OlgaItem(Item):
     name = Field()
+    clinics = Field()
+    addresses = Field()
+    phones = Field()
     link = Field()
-
-class MafaldaItem(OlgaItem):
-    iD = Field()
-    address = Field()
-    phone = Field()
+   
     
